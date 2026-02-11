@@ -19,7 +19,7 @@ EOT
     location                      = string
     name                          = string
     resource_group_name           = string
-    bgp_route_propagation_enabled = optional(bool, true)
+    bgp_route_propagation_enabled = optional(bool) # Default: true
     tags                          = optional(map(string))
     route = optional(object({
       address_prefix         = string
