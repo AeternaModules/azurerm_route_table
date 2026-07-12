@@ -1,3 +1,7 @@
+output "route_tables_id" {
+  description = "Map of id values across all route_tables, keyed the same as var.route_tables"
+  value       = { for k, v in azurerm_route_table.route_tables : k => v.id }
+}
 output "route_tables_bgp_route_propagation_enabled" {
   description = "Map of bgp_route_propagation_enabled values across all route_tables, keyed the same as var.route_tables"
   value       = { for k, v in azurerm_route_table.route_tables : k => v.bgp_route_propagation_enabled }
