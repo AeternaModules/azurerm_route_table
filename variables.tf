@@ -21,29 +21,13 @@ EOT
     resource_group_name           = string
     bgp_route_propagation_enabled = optional(bool) # Default: true
     tags                          = optional(map(string))
-    route = optional(object({
+    route = optional(list(object({
       address_prefix         = string
       name                   = string
       next_hop_in_ip_address = optional(string)
       next_hop_type          = string
-    }))
+    })))
   }))
-  validation {
-    condition = alltrue([
-      for k, v in var.route_tables : (
-        v.route == null || (length(v.route.address_prefix) > 0)
-      )
-    ])
-    error_message = "must not be empty"
-  }
-  validation {
-    condition = alltrue([
-      for k, v in var.route_tables : (
-        v.route == null || (v.route.next_hop_in_ip_address == null || (length(v.route.next_hop_in_ip_address) > 0))
-      )
-    ])
-    error_message = "must not be empty"
-  }
   # --- Unconfirmed validation candidates, derived from azurerm_route_table's provider source ---
   # Not auto-enabled: either a bespoke provider validator we can't safely translate,
   # or a path that crosses a list-typed block (needs its own for_each wrapping).
@@ -68,8 +52,14 @@ EOT
   #   source:    [from resourcegroups.ValidateName] !matched
   # path: route.name
   #   source:    [from validate.RouteName] !regexp.MustCompile(`^[a-zA-Z0-9][a-zA-Z0-9_.-]{0,78}[a-zA-Z0-9_]?$`).MatchString(value)
+  # path: route.address_prefix
+  #   condition: length(value) > 0
+  #   message:   must not be empty
   # path: route.next_hop_type
   #   source:    validation.StringInSlice value list is not a literal []string - likely a generated PossibleValuesFor*() helper; resolve separately
+  # path: route.next_hop_in_ip_address
+  #   condition: length(value) > 0
+  #   message:   must not be empty
   # path: tags
   #   condition: length(value) <= 50
   #   message:   [from tags.Validate: invalid when len(value) > 50]
